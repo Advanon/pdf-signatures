@@ -1,0 +1,33 @@
+{
+  "name": "pdf-signatures",
+  "version": "0.0.1",
+  "description": "Sign PDFs with electronic signatures in Nodejs",
+  "main": "./src/main/js/index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "engines": {
+    "node": ">=8.10.0"
+  },
+  "keywords": [
+    "sign",
+    "pdf",
+    "nodejs"
+  ],
+  "author": "Advanon Team",
+  "license": "AGPL",
+  "dependencies": {
+    "get-installed-path": "^4.0.8"
+  },
+  "devDependencies": {
+    "eslint": "^6.2.1",
+    "eslint-plugin-node": "^9.1.0",
+    "jest": "^24.9.0"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "node_modules/"
+    ]
+  }
+}

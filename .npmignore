@@ -1,0 +1,10 @@
+.vscode
+
+/src/main/java
+/src/test/java
+/gradle
+
+build.gradle
+settings.gradle
+gradlew
+gradlew.bat
