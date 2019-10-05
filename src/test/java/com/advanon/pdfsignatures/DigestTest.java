@@ -2,7 +2,6 @@ package com.advanon.pdfsignatures;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -46,39 +45,30 @@ class DigestTest {
   @Test
   public void itCalculatesSha256Digest() throws IOException, DigestException {
     byte[] bytes = "ABCD".getBytes(StandardCharsets.UTF_8);
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
     assertArrayEquals(
         sampleSha256Sequence,
-        new Digest(inputStream).calculate(HashAlgorithm.SHA_256)
+        new Digest(bytes).calculate(HashAlgorithm.SHA_256)
     );
-
-    inputStream.close();
   }
 
   @Test
   public void itCalculatesSha384Digest() throws IOException, DigestException {
     byte[] bytes = "ABCD".getBytes(StandardCharsets.UTF_8);
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
     assertArrayEquals(
         sampleSha384Sequence,
-        new Digest(inputStream).calculate(HashAlgorithm.SHA_384)
+        new Digest(bytes).calculate(HashAlgorithm.SHA_384)
     );
-
-    inputStream.close();
   }
 
   @Test
   public void itCalculatesSha512Digest() throws IOException, DigestException {
     byte[] bytes = "ABCD".getBytes(StandardCharsets.UTF_8);
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
 
     assertArrayEquals(
         sampleSha512Sequence,
-        new Digest(inputStream).calculate(HashAlgorithm.SHA_512)
+        new Digest(bytes).calculate(HashAlgorithm.SHA_512)
     );
-
-    inputStream.close();
   }
 }

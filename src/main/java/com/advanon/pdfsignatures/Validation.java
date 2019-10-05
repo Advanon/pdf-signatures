@@ -90,13 +90,8 @@ class Validation extends PdfChange {
       stamper.close();
       outputStream.close();
 
-      updateHashableBytesStream(pdf);
-
-      pdf.setContentBytes(
-          new ByteArrayInputStream(
-            ((ByteArrayOutputStream) outputStream).toByteArray()
-          )
-      );
+      pdf.setContentBytes(((ByteArrayOutputStream) outputStream).toByteArray());
+      pdf.updateHashableBytes();
     } catch (IOException | GeneralSecurityException | DocumentException e) {
       throw new ValidationException(e.getMessage());
     }

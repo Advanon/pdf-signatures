@@ -2,7 +2,6 @@ package com.advanon.pdfsignatures;
 
 import com.itextpdf.text.pdf.codec.Base64;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -42,6 +41,8 @@ class ApplicationCommand {
         return executeVersion();
       case "placeholder":
         return executePlaceholder();
+      case "digest":
+        return executeDigest();
       case "sign":
         return executeSign();
       case "ltv":
@@ -61,7 +62,7 @@ class ApplicationCommand {
       "  version                                     Display current version number\n" +
       "  --version                                   Display current version number\n" +
       "  -v                                          Display current version number\n" +
-      "  placeholder                                 Add a signature placeholder and calculate document digest\n" +
+      "  placeholder                                 Add a signature placeholder\n" +
       "    --file <path>                             Path to the document\n" +
       "    --out <path>                              Path where to save a new document\n" +
       "    [--estimatedsize <int>]                   Estimated signature size, default is 30000 bytes\n" +
@@ -71,12 +72,15 @@ class ApplicationCommand {
       "      * 2                                     Certified, form filling\n" +
       "      * 3                                     Certified, form filling and annotations\n" +
       "    [--password <string>]                     Document password\n" +
-      "    [--algorithm <SHA-256|SHA-384|SHA-512>]   Encryption algorithm, default is SHA-512\n" +
       "    [--reason <reason>]                       Signing reason\n" +
       "    [--location <location>]                   Signing location\n" +
       "    [--contact <contact>]                     Signing contact\n" +
       "    [--date <contact>]                        Date of signing in ISO 8601 format\n" +
-      "  sign                                        Sign the document with external signature (use exact values as for #digest)\n" +
+      "  digest                                      Calculate document digest excluding signatures\n" +
+      "    --file <path>                             Path to the document\n" +
+      "    [--password <string>]                     Document password\n" +
+      "    [--algorithm <SHA-256|SHA-384|SHA-512>]   Encryption algorithm, default is SHA-512\n" +
+      "  sign                                        Sign the document with external signature\n" +
       "    --file <path>                             Path to the document\n" +
       "    --out <path>                              Path where to save a new document\n" +
       "    --signature <base64 string>               Base64-encoded signature\n" +
@@ -89,9 +93,10 @@ class ApplicationCommand {
       "    [--password <string>]                     Document password\n" +
       "\n" +
       "Example\n" +
-      "  digest --file file.pdf --algorithm sha512                                                         Calculate document digest\n" +
-      "  sign --file file.pdf --out signed.pdf --signature abb4rjfh=                                       Sign the document with external signature\n" +
-      "  ltv --file file.pdf --crl abb4rjfh= --crl fgsllldj5kg= --oscp abb4rjfh= --ocsp fgsllldj5kg=       Insert LTV information into signed document"
+      "  placeholder --file file.pdf --out placeholdered.pdf                                                                   Add signature placeholder\n" +
+      "  digest --file placeholdered.pdf --algorithm sha512                                                                    Calculate document digest\n" +
+      "  sign --file placeholdered.pdf --out signed.pdf --signature abb4rjfh=                                                  Sign the document with external signature\n" +
+      "  ltv --file signed.pdf --out signedltv.pdf --crl abb4rjfh= --crl fgsllldj5kg= --oscp abb4rjfh= --ocsp fgsllldj5kg=     Insert LTV information into signed document"
     ;
   }
   // CHECKSTYLE:ON
@@ -124,8 +129,19 @@ class ApplicationCommand {
     pdf.addSignaturePlaceholder(placeholder);
 
     OutputStream fileOutputStream = new FileOutputStream(arguments.getOut());
-    ((ByteArrayOutputStream) pdf.getContentBytes()).writeTo(fileOutputStream);
+    fileOutputStream.write(pdf.getContentBytes());
     fileOutputStream.close();
+
+    return arguments.getOut();
+  }
+
+  private String executeDigest()
+      throws PdfDocumentException, SignatureException,
+             DigestException, IOException {
+    PdfDocument pdf = new PdfDocument(
+        arguments.getFile(),
+        arguments.getPassword()
+    );
 
     return Base64.encodeBytes(
         pdf.digest(arguments.getHashAlgorithm()), Base64.DONT_BREAK_LINES
@@ -143,7 +159,7 @@ class ApplicationCommand {
     pdf.addSignature(signature);
 
     OutputStream fileOutputStream = new FileOutputStream(arguments.getOut());
-    ((ByteArrayOutputStream) pdf.getContentBytes()).writeTo(fileOutputStream);
+    fileOutputStream.write(pdf.getContentBytes());
     fileOutputStream.close();
 
     return arguments.getOut();
@@ -164,7 +180,7 @@ class ApplicationCommand {
     pdf.addValidation(ltv);
 
     OutputStream fileOutputStream = new FileOutputStream(arguments.getOut());
-    ((ByteArrayOutputStream) pdf.getContentBytes()).writeTo(fileOutputStream);
+    fileOutputStream.write(pdf.getContentBytes());
     fileOutputStream.close();
 
     return arguments.getOut();

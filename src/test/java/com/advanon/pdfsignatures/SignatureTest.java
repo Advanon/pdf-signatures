@@ -1,19 +1,22 @@
 package com.advanon.pdfsignatures;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.security.PdfPKCS7;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,15 +43,15 @@ class SignatureTest {
   private Path placeholderedPdfPath =
       Paths.get("src", "test", "java", "resources", "placeholdered_pdf.pdf");
   private Path placeholderedDigestPath = Paths.get(
-      "src", "test", "java", "resources", "placeholdered_digest.sha512"
+      "src", "test", "java", "resources", "digest.sha512"
   );
 
   BouncyCastleProvider provider = new BouncyCastleProvider();
 
   @Mock private PdfDocument pdfDocument;
 
-  @Captor ArgumentCaptor<ByteArrayInputStream> contentBytesCaptor;
-  @Captor ArgumentCaptor<ByteArrayInputStream> hashableBytesCaptor;
+  @Captor ArgumentCaptor<byte[]> contentBytesCaptor;
+  @Captor ArgumentCaptor<byte[]> hashableBytesCaptor;
 
   @BeforeEach
   public void setup() throws IOException {
@@ -62,18 +65,19 @@ class SignatureTest {
         contentBytesStream
     );
 
-    InputStream readerInputStream
-        = new FileInputStream(placeholderedPdfPath.toFile().getAbsolutePath());
-
     when(pdfDocument.getReader()).thenReturn(
         new PdfReader(new ByteArrayInputStream(pdfBytes))
     );
 
-    when(pdfDocument.getContentBytes()).thenReturn(
-        (ByteArrayOutputStream) contentBytesStream
-    );
+    when(pdfDocument.getContentBytes()).thenReturn(pdfBytes);
+    doCallRealMethod().when(pdfDocument).updateHashableBytes();
 
-    readerInputStream.close();
+    when(
+        pdfDocument.signatureHexBytePosition(
+          isA(PdfDictionary.class),
+          anyInt()
+        )
+    ).thenCallRealMethod();
   }
 
   @Test
@@ -88,29 +92,15 @@ class SignatureTest {
     verify(pdfDocument).setContentBytes(contentBytesCaptor.capture());
     verify(pdfDocument).setHashableBytes(hashableBytesCaptor.capture());
 
-    ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        contentBytesCaptor.getValue(), contentBytes
-    );
-
-    ByteArrayOutputStream hashableBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        hashableBytesCaptor.getValue(), hashableBytes
-    );
+    byte[] contentBytes = contentBytesCaptor.getValue();
+    byte[] hashableBytes = hashableBytesCaptor.getValue();
 
     int originalPdfLength = Files.readAllBytes(placeholderedPdfPath).length;
 
+    assertTrue(contentBytes.length == originalPdfLength);
     assertTrue(
-        contentBytes.toByteArray().length == originalPdfLength
+        hashableBytes.length <= originalPdfLength + hashableBytesRangeThreshold
     );
-
-    assertTrue(
-        hashableBytes.toByteArray().length
-          <= originalPdfLength + hashableBytesRangeThreshold
-    );
-
-    contentBytes.close();
-    hashableBytes.close();
   }
 
   @Test
@@ -124,13 +114,10 @@ class SignatureTest {
 
     verify(pdfDocument).setContentBytes(contentBytesCaptor.capture());
 
-    ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        contentBytesCaptor.getValue(), contentBytes
-    );
+    byte[] contentBytes = contentBytesCaptor.getValue();
 
     PdfReader reader = new PdfReader(
-        new ByteArrayInputStream(contentBytes.toByteArray())
+        new ByteArrayInputStream(contentBytes)
     );
 
     AcroFields fields = reader.getAcroFields();
@@ -148,10 +135,9 @@ class SignatureTest {
           "2018-08-13"
       );
     }
-
-    contentBytes.close();
   }
 
+  @Test
   public void itHasTheSameDigestAsPlaceholderedDocument() throws IOException {
     byte[] signatureBytes = Files.readAllBytes(signaturePath);
 
@@ -159,16 +145,13 @@ class SignatureTest {
 
     signature.apply(pdfDocument);
 
-    ByteArrayOutputStream hashableBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        hashableBytesCaptor.getValue(), hashableBytes
-    );
+    verify(pdfDocument).setHashableBytes(hashableBytesCaptor.capture());
 
+    byte[] hashableBytes = hashableBytesCaptor.getValue();
     byte[] placeholderedDigest = Files.readAllBytes(placeholderedDigestPath);
-    byte[] signedDigest = new Digest(
-      new ByteArrayInputStream(hashableBytes.toByteArray())
-    ).calculate(HashAlgorithm.SHA_512);
+    byte[] signedDigest
+           = new Digest(hashableBytes).calculate(HashAlgorithm.SHA_512);
 
-    assertEquals(signedDigest, placeholderedDigest);
+    assertArrayEquals(signedDigest, placeholderedDigest);
   }
 }

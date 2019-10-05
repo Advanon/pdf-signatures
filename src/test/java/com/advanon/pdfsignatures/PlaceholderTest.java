@@ -43,8 +43,8 @@ class PlaceholderTest {
   @Mock private SignatureMetadata signatureMetadata;
   @Mock private PdfDocument pdfDocument;
 
-  @Captor ArgumentCaptor<ByteArrayInputStream> contentBytesCaptor;
-  @Captor ArgumentCaptor<ByteArrayInputStream> hashableBytesCaptor;
+  @Captor ArgumentCaptor<byte[]> contentBytesCaptor;
+  @Captor ArgumentCaptor<byte[]> hashableBytesCaptor;
 
   @BeforeEach
   public void setup() throws IOException {
@@ -78,30 +78,18 @@ class PlaceholderTest {
     verify(pdfDocument).setContentBytes(contentBytesCaptor.capture());
     verify(pdfDocument).setHashableBytes(hashableBytesCaptor.capture());
 
-    ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        contentBytesCaptor.getValue(), contentBytes
-    );
-
-    ByteArrayOutputStream hashableBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        hashableBytesCaptor.getValue(), hashableBytes
-    );
+    byte[] contentBytes = contentBytesCaptor.getValue();
+    byte[] hashableBytes = hashableBytesCaptor.getValue();
 
     int originalPdfLength = Files.readAllBytes(unsignedPdfPath).length;
 
     assertTrue(
-        contentBytes.toByteArray().length
-          >= originalPdfLength + estimatedSignatureSize
+        contentBytes.length >= originalPdfLength + estimatedSignatureSize
     );
 
     assertTrue(
-        hashableBytes.toByteArray().length
-          <= originalPdfLength + hashableBytesRangeThreshold
+        hashableBytes.length <= originalPdfLength + hashableBytesRangeThreshold
     );
-
-    contentBytes.close();
-    hashableBytes.close();
   }
 
   @Test
@@ -115,16 +103,9 @@ class PlaceholderTest {
 
     verify(pdfDocument).setContentBytes(contentBytesCaptor.capture());
 
-    ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        contentBytesCaptor.getValue(), contentBytes
-    );
+    byte[] contentBytes = contentBytesCaptor.getValue();
 
-
-    PdfReader reader = new PdfReader(
-        new ByteArrayInputStream(contentBytes.toByteArray())
-    );
-
+    PdfReader reader = new PdfReader(contentBytes);
     AcroFields fields = reader.getAcroFields();
     List<String> names = fields.getSignatureNames();
     PdfDictionary signatureDictionary
@@ -151,7 +132,5 @@ class PlaceholderTest {
             "^" + formattedSignatureDate.replace("+", "\\+") + ".*$"
         )
     );
-
-    contentBytes.close();
   }
 }

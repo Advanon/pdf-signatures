@@ -5,7 +5,6 @@ import com.itextpdf.text.pdf.ByteBuffer;
 import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfReader;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -36,16 +35,15 @@ class Signature extends PdfChange {
 
       AcroFields acroFields = reader.getAcroFields();
       List<String> signatureNames = acroFields.getSignatureNames();
-      byte[] pdfBytes
-             = ((ByteArrayOutputStream) pdf.getContentBytes()).toByteArray();
+      byte[] pdfBytes = pdf.getContentBytes();
 
       for (String name : signatureNames) {
         PdfDictionary signatureDict = acroFields.getSignatureDictionary(name);
-        long signatureStartHexByte = signatureHexBytePosition(
-            signatureDict, SIGNATURE_START_BYTE_POS
+        long signatureStartHexByte = pdf.signatureHexBytePosition(
+            signatureDict, PdfDocument.SIGNATURE_START_BYTE_POS
         );
-        long signatureEndHexByte = signatureHexBytePosition(
-            signatureDict, SIGNATURE_END_BYTE_POS
+        long signatureEndHexByte = pdf.signatureHexBytePosition(
+            signatureDict, PdfDocument.SIGNATURE_END_BYTE_POS
         );
 
         assertActualSignatureSizeFitsPlaceholder(
@@ -64,9 +62,8 @@ class Signature extends PdfChange {
 
       outputStream.close();
 
-      updateHashableBytesStream(pdf);
-
-      pdf.setContentBytes(new ByteArrayInputStream(pdfBytes));
+      pdf.setContentBytes(pdfBytes);
+      pdf.updateHashableBytes();
     } catch (IOException e) {
       throw new SignatureException(e.getMessage());
     }

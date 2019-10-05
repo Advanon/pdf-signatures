@@ -12,7 +12,6 @@ import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfString;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,14 +78,17 @@ final class Placeholder extends PdfChange {
       );
 
       InputStream rangeStream = signatureAppearance.getRangeStream();
-      pdf.setHashableBytes(rangeStream);
+      ByteArrayOutputStream rangeOutputStream = new ByteArrayOutputStream();
+      Streams.copyInputToOutputStream(rangeStream, rangeOutputStream);
+      pdf.setHashableBytes(rangeOutputStream.toByteArray());
+      rangeOutputStream.close();
 
       assertWritingCertificationLevel(reader);
 
       signatureAppearance.close(buildSignaturePlaceholder(signature));
       outputStream.close();
 
-      pdf.setContentBytes(new ByteArrayInputStream(outputStream.toByteArray()));
+      pdf.setContentBytes(outputStream.toByteArray());
     } catch (IOException | DocumentException e) {
       throw new SignatureException(e.getMessage());
     }

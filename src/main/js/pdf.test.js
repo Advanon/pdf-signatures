@@ -1,32 +1,36 @@
-const { preparePdf, signPdf, addLtvToPdf } = require('./pdf');
+const {
+  addSignaturePlaceholderToPdf,
+  pdfDigest,
+  signPdf,
+  addLtvToPdf,
+} = require('./pdf');
 
 jest.mock('./command');
 
 const { executeCommand } = require('./command');
 
-describe('#preparePdf', () => {
+describe('#addSignaturePlaceholderToPdf', () => {
   it('requires "file" to be set', async () => {
-    await expect(preparePdf({ out: 'out.pdf' }))
+    await expect(addSignaturePlaceholderToPdf({ out: 'out.pdf' }))
       .rejects
       .toEqual(new Error('\'file\' and \'out\' attributes are mandatory'));
   });
 
   it('requires "out" to be set', async () => {
-    await expect(preparePdf({ file: 'file.pdf' }))
+    await expect(addSignaturePlaceholderToPdf({ file: 'file.pdf' }))
       .rejects
       .toEqual(new Error('\'file\' and \'out\' attributes are mandatory'));
   });
 
-  it('calls #executeCommand with proper arguments', async () => {
+  it('calls #addSignaturePlaceholderToPdf with proper arguments', async () => {
     const date = new Date().toISOString();
 
-    await preparePdf({
+    await addSignaturePlaceholderToPdf({
       file: 'my-file.pdf',
       out: 'out-file.pdf',
       estimatedsize: 10000,
       certlevel: 0,
       password: '123456',
-      algorithm: 'SHA-512',
       reason: 'reason',
       location: 'test location',
       contact: 'Major Payne',
@@ -39,11 +43,34 @@ describe('#preparePdf', () => {
       estimatedsize: 10000,
       certlevel: 0,
       password: '123456',
-      algorithm: 'SHA-512',
       reason: 'reason',
       location: 'test location',
       contact: 'Major Payne',
       date,
+    });
+  });
+});
+
+describe('#pdfDigest', () => {
+  it('requires "file" to be set', async () => {
+    await expect(pdfDigest({}))
+      .rejects
+      .toEqual(new Error('\'file\' attribute is mandatory'));
+  });
+
+  it('calls #pdfDigest with proper arguments', async () => {
+    const date = new Date().toISOString();
+
+    await pdfDigest({
+      file: 'my-file.pdf',
+      password: '123456',
+      algorithm: 'SHA-512',
+    });
+
+    expect(executeCommand).toHaveBeenCalledWith('digest', {
+      file: 'my-file.pdf',
+      password: '123456',
+      algorithm: 'SHA-512',
     });
   });
 });

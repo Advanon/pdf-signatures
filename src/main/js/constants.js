@@ -35,7 +35,8 @@ const ResponseKeysMap = {
  * @enum {string}
  */
 const CommandsMap = {
-  PrepareDocument: 'placeholder',
+  CalculateDigest: 'digest',
+  AddPlaceholder: 'placeholder',
   SignDocument: 'sign',
   AddLtvInformation: 'ltv',
 };

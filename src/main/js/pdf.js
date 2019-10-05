@@ -10,7 +10,6 @@ const { executeCommand } = require('./command');
  * @param {number} [params.estimatedsize=30000]
  * @param {number} [params.certlevel=0]
  * @param {string} [params.password]
- * @param {string} [params.algorithm='SHA-512']
  * @param {string} [params.reason]
  * @param {string} [params.location]
  * @param {string} [params.contact]
@@ -18,13 +17,12 @@ const { executeCommand } = require('./command');
  *
  * @returns {string} Bae64-encoded document digest
  */
-const preparePdf = async ({
+const addSignaturePlaceholderToPdf = async ({
   file,
   out,
   estimatedsize,
   certlevel,
   password,
-  algorithm,
   reason,
   location,
   contact,
@@ -34,17 +32,38 @@ const preparePdf = async ({
     throw new Error('\'file\' and \'out\' attributes are mandatory');
   }
 
-  return executeCommand(CommandsMap.PrepareDocument, {
+  return executeCommand(CommandsMap.AddPlaceholder, {
     file,
     out,
     estimatedsize,
     certlevel,
     password,
-    algorithm,
     reason,
     location,
     contact,
     date,
+  });
+};
+
+/**
+ * Create a new pdf with signature placeholder and calculate it's digest.
+ *
+ * @param {object} params
+ * @param {string} params.file
+ * @param {string} [params.password]
+ * @param {string} [params.algorithm='SHA-512']
+ *
+ * @returns {string} Bae64-encoded document digest
+ */
+const pdfDigest = async ({ file, password, algorithm }) => {
+  if (!(file)) {
+    throw new Error('\'file\' attribute is mandatory');
+  }
+
+  return executeCommand(CommandsMap.CalculateDigest, {
+    file,
+    password,
+    algorithm,
   });
 };
 
@@ -107,7 +126,8 @@ const addLtvToPdf = async ({ file, out, crl, ocsp }) => {
 };
 
 module.exports = {
-  preparePdf,
+  addSignaturePlaceholderToPdf,
+  pdfDigest,
   signPdf,
   addLtvToPdf,
 };

@@ -1,9 +1,13 @@
 package com.advanon.pdfsignatures;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfReader;
 
 import java.io.ByteArrayInputStream;
@@ -33,7 +37,7 @@ class ValidationTest {
       Paths.get("src", "test", "java", "resources", "signed_pdf.pdf");
 
   @Mock private PdfDocument pdfDocument;
-  @Captor ArgumentCaptor<ByteArrayInputStream> contentBytesCaptor;
+  @Captor ArgumentCaptor<byte[]> contentBytesCaptor;
 
   @BeforeEach
   public void setup() throws IOException {
@@ -51,9 +55,15 @@ class ValidationTest {
           new PdfReader(new ByteArrayInputStream(pdfBytes))
     );
 
-    when(pdfDocument.getContentBytes()).thenReturn(
-        (ByteArrayOutputStream) contentBytesStream
-    );
+    when(pdfDocument.getContentBytes()).thenReturn(pdfBytes);
+    doCallRealMethod().when(pdfDocument).updateHashableBytes();
+
+    when(
+        pdfDocument.signatureHexBytePosition(
+          isA(PdfDictionary.class),
+          anyInt()
+        )
+    ).thenCallRealMethod();
   }
 
   @Test
@@ -70,18 +80,13 @@ class ValidationTest {
 
     verify(pdfDocument).setContentBytes(contentBytesCaptor.capture());
 
-    ByteArrayOutputStream contentBytes = new ByteArrayOutputStream();
-    Streams.copyInputToOutputStream(
-        contentBytesCaptor.getValue(), contentBytes
-    );
+    byte[] contentBytes = contentBytesCaptor.getValue();
 
     int originalPdfLength = Files.readAllBytes(signedPdfPath).length;
 
     assertTrue(
-        contentBytes.toByteArray().length
+        contentBytes.length
           > originalPdfLength + crlBytes.length + ocspBytes.length
     );
-
-    contentBytes.close();
   }
 }

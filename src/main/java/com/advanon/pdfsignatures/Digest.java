@@ -1,9 +1,5 @@
 package com.advanon.pdfsignatures;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -11,10 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 class Digest {
-  private InputStream inputStream;
+  private byte[] bytes;
 
-  Digest(@NotNull InputStream inputStream) {
-    this.inputStream = inputStream;
+  Digest(@NotNull byte[] bytes) {
+    this.bytes = bytes;
   }
 
   /**
@@ -32,15 +28,8 @@ class Digest {
             : algorithm.getAlgorithmName()
       );
 
-      OutputStream outputStream = new ByteArrayOutputStream();
-      Streams.copyInputToOutputStream(this.inputStream, outputStream);
-
-      outputStream.close();
-
-      return digest.digest(
-        ((ByteArrayOutputStream) outputStream).toByteArray()
-      );
-    } catch (NoSuchAlgorithmException | IOException e) {
+      return digest.digest(bytes);
+    } catch (NoSuchAlgorithmException e) {
       throw new DigestException(e.getMessage());
     }
   }
