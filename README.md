@@ -2,7 +2,7 @@
 
 # PDF-Signatures
 
-Sign PDFs with PKCS7 signatures like a pro!
+Sign PDFs with PKCS7 signatures like a boss!
 
 ## Dependencies
 * UNIX-like OS
@@ -38,7 +38,7 @@ See https://www.gnu.org/licenses/agpl-3.0.en.html.
 ```js
 const { addSignaturePlaceholderToPdf, CertificationLevels } = require('pdf-signatures');
 
-const base64EncodedDigest = await addSignaturePlaceholderToPdf({
+const outputPath = await addSignaturePlaceholderToPdf({
   file: '/path/to/file.pdf',                   // Path to file, Required
   out: '/path/to/out.pdf',                     // Output file path, Required
   estimatedsize: 30000,                        // Estimated signature size, Optional, Default is 30000
