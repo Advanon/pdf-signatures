@@ -29,9 +29,7 @@ class ApplicationArguments {
   private List<byte[]> ocsps = new ArrayList<>();
 
   ApplicationArguments(@NotNull List<String> arguments) {
-    for (String argument : arguments) {
-      this.arguments.add(argument);
-    }
+    this.arguments.addAll(arguments);
   }
 
   public ApplicationArguments parse() {

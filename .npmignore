@@ -4,7 +4,17 @@
 /src/test/java
 /gradle
 
+.gradle
 build.gradle
 settings.gradle
 gradlew
 gradlew.bat
+
+build/
+bin/
+node_modules/
+
+.classpath
+.project
+.settings
+.factorypath

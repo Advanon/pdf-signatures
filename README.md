@@ -16,15 +16,11 @@ may be licenced under different licence types.
 
 See https://www.gnu.org/licenses/agpl-3.0.en.html.
 
-
-## Development dependencies
-* Gradle https://gradle.org/install/
-
 ## Testing
 * npm run lint
 * npm run test
-* gradle checkstyleMain
-* gradle test
+* ./gradlew checkstyleMain
+* ./gradlew test
 
 ## Building (Before publishing an npm package)
 * gradle build
@@ -161,7 +157,7 @@ that this will (or at least that should) be actually written as `FF` which is
 now `TWO!` bytes.
 
 Now you may wonder what does `+2` or `-2` mean. The answer is pretty
-straitforward - content of PDF objects begins with `<` and ends with `>`,
+straightforward - content of PDF objects begins with `<` and ends with `>`,
 and sometimes you simply don't need these markers taken into account.
 
 ### Signature byte range and document hash

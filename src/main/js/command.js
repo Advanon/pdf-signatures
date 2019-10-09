@@ -25,16 +25,16 @@ const initResult = () => ({
  * @param {object} args
  */
 const buildArguments = (args) => {
-  const filteredArgs = Object.keys(args).filter(
-    (arg) => args[arg] !== null && args[arg] !== undefined
+  const filteredArgPairs = Object.entries(args).filter(
+    ([, value]) => value !== null && value !== undefined
   );
 
-  return filteredArgs.map((arg) => {
-    if (args[arg] instanceof Array) {
-      return args[arg].map((subArg) => `--${arg} "${subArg}"`).join(' ');
+  return filteredArgPairs.map(([name, value]) => {
+    if (value instanceof Array) {
+      return value.map((subArg) => `--${name} "${subArg}"`).join(' ');
     }
 
-    return `--${arg} "${args[arg]}"`;
+    return `--${name} "${value}"`;
   }).join(' ');
 };
 

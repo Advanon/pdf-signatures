@@ -14,7 +14,7 @@ const {
 const { ExecutablePath } = require('./constants');
 
 describe('#initResult', () => {
-  it('initializes result object', () => {
+  test('initializes result object', () => {
     expect(initResult()).toEqual({
       status: null,
       result: null,
@@ -25,7 +25,7 @@ describe('#initResult', () => {
 });
 
 describe('#buildArguments', () => {
-  it('initializes result object', () => {
+  test('initializes result object', () => {
     const date = new Date().toISOString();
 
     const args = {
@@ -37,6 +37,8 @@ describe('#buildArguments', () => {
         'rock'
       ],
       at: date,
+      undefined: undefined,
+      null: null,
     };
 
     const argumentsString = `--hello "world" --my "name" --is "John Doe" --lets "have a party" --lets "rock" --at "${date}"`;
@@ -46,7 +48,7 @@ describe('#buildArguments', () => {
 });
 
 describe('#parseResponse', () => {
-  it('parses successfull response', () => {
+  test('parses successfull response', () => {
     const response = "STATUS=SUCCESS\nRESULT=HELLO\n";
     const parsedResponse = {
       status: 'SUCCESS',
@@ -58,7 +60,7 @@ describe('#parseResponse', () => {
     expect(parseResponse(response)).toEqual(parsedResponse);
   });
 
-  it('parses error response', () => {
+  test('parses error response', () => {
     const response = "STATUS=ERROR\nERROR_TYPE=DocumentException\nERROR_MESSAGE=Error\n";
     const parsedResponse = {
       status: 'ERROR',
@@ -70,7 +72,7 @@ describe('#parseResponse', () => {
     expect(parseResponse(response)).toEqual(parsedResponse);
   });
 
-  it('throws exception if paese fails', () => {
+  test('throws exception if paese fails', () => {
     const response = "random string";
 
     expect(() => {
@@ -78,7 +80,7 @@ describe('#parseResponse', () => {
     }).toThrowError('Could not parse response');
   });
 
-  it('throws exception for unsupported keys', () => {
+  test('throws exception for unsupported keys', () => {
     const response = "UNSUPPORTED_KEY=value\n";
 
     expect(() => {
@@ -88,7 +90,7 @@ describe('#parseResponse', () => {
 });
 
 describe('#executeCommand', () => {
-  it('initializes result object', async () => {
+  test('initializes result object', async () => {
     getInstalledPath.mockImplementation(() => 'fake-self-path');
 
     exec.mockImplementation((cmd, callback) => {

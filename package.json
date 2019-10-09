@@ -5,7 +5,8 @@
   "main": "./src/main/js/index.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build": "./gradlew build && ./gradlew copyJarToLibs"
   },
   "engines": {
     "node": ">=8.10.0"

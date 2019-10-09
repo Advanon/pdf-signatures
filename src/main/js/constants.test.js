@@ -3,7 +3,7 @@ const fs = require('fs');
 const { PackageName, PackageVersion, ExecutablePath } = require('./constants');
 
 describe('PackageName', () => {
-  it('has right package name', () => {
+  test('has right package name', () => {
     const packageJson = JSON.parse(fs.readFileSync('package.json'));
     const gradleSettings = fs.readFileSync('settings.gradle');
 
@@ -16,7 +16,7 @@ describe('PackageName', () => {
 });
 
 describe('PackageVersion', () => {
-  it('has right package version', () => {
+  test('has right package version', () => {
     const packageJson = JSON.parse(fs.readFileSync('package.json'));
     const gradleSettings = fs.readFileSync('build.gradle');
 
@@ -29,7 +29,7 @@ describe('PackageVersion', () => {
 });
 
 describe('ExecutablePath', () => {
-  it('has right executable path', () => {
+  test('has right executable path', () => {
     expect(ExecutablePath).toEqual(`libs/${PackageName}-${PackageVersion}.jar`);
     expect(fs.existsSync(ExecutablePath)).toEqual(true);
   });
