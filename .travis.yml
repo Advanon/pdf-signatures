@@ -15,8 +15,10 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 before_install:
+  - ./gradlew build
+  - ./gradlew copyJarToLibs
+  - ./gradlew test
+  - ./gradlew checkstyleMain
   - npm install
   - npm run lint
   - npm run test
-  - ./gradlew test
-  - ./gradlew checkstyleMain
