@@ -3,6 +3,7 @@
 /src/main/java
 /src/test/java
 /gradle
+/config
 
 .gradle
 build.gradle
