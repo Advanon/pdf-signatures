@@ -1,0 +1,24 @@
+---
+sudo: false
+language: java
+cache: npm
+jdk:
+  - openjdk8
+node_js:
+  - 10
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  npm: true
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+before_install:
+  - ./gradlew build
+  - ./gradlew copyJarToLibs
+  - ./gradlew test
+  - ./gradlew checkstyleMain
+  - npm install
+  - npm run lint
+  - npm run test

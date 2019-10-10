@@ -1,0 +1,20 @@
+{
+  "extends": [
+      "eslint:recommended",
+      "plugin:node/recommended"
+  ],
+  "rules": {
+    "max-len": [1, 80, 2],
+    "indent": [2, 2, { "SwitchCase": 1 }],
+    "comma-dangle": ["error", "always-multiline"],
+    "eol-last": ["error", "always"],
+    "no-trailing-spaces": "error",
+    "no-var": "error",
+    "brace-style": "error",
+    "object-curly-spacing": [2, "always"],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "node/no-unpublished-require": "warn"
+  }
+}
