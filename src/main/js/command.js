@@ -45,7 +45,7 @@ const buildArguments = (args) => {
  * @returns {object}
  */
 const parseResponse = (response) => {
-  const lines = response.split('\n').filter((line) => line);
+  const lines = response.replace(/\r/g, "").split('\n').filter((line) => line);
 
   const pairs = lines.map((line) => {
     const matches = /^([a-z_]+)=(.+)$/i.exec(line);
