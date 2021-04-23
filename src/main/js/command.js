@@ -14,7 +14,7 @@ const {
  */
 const initResult = () => ({
   ...(Object.values(ResponseKeysMap).reduce(
-    (result, value) => ({ ...result, [value]: null }), {}
+    (result, value) => ({ ...result, [value]: null }), {},
   )),
 });
 
@@ -26,7 +26,7 @@ const initResult = () => ({
  */
 const buildArguments = (args) => {
   const filteredArgPairs = Object.entries(args).filter(
-    ([, value]) => value !== null && value !== undefined
+    ([, value]) => value !== null && value !== undefined,
   );
 
   return filteredArgPairs.map(([name, value]) => {
@@ -45,7 +45,7 @@ const buildArguments = (args) => {
  * @returns {object}
  */
 const parseResponse = (response) => {
-  const lines = response.replace(/\r/g, "").split('\n').filter((line) => line);
+  const lines = response.replace(/\r/g, '').split('\n').filter((line) => line);
 
   const pairs = lines.map((line) => {
     const matches = /^([a-z_]+)=(.+)$/i.exec(line);
@@ -89,7 +89,7 @@ const executeCommand = async (command, args = {}) => {
             reject(`Error ${response.errorType}: ${response.errorMessage}`);
           }
         }
-      }
+      },
     );
   });
 };

@@ -86,7 +86,7 @@ const signPdf = async ({
 }) => {
   if (!(file && out && signature)) {
     throw new Error(
-      '\'file\', \'out\' and \'signature\' attributes are mandatory'
+      '\'file\', \'out\' and \'signature\' attributes are mandatory',
     );
   }
 
@@ -112,7 +112,7 @@ const signPdf = async ({
 const addLtvToPdf = async ({ file, out, crl, ocsp }) => {
   if (!(file && out && crl && ocsp)) {
     throw new Error(
-      '\'file\', \'out\', \'crl\' and \'ocsp\' attributes are mandatory'
+      '\'file\', \'out\', \'crl\' and \'ocsp\' attributes are mandatory',
     );
   }
 
@@ -121,7 +121,7 @@ const addLtvToPdf = async ({ file, out, crl, ocsp }) => {
   }
 
   return executeCommand(
-    CommandsMap.AddLtvInformation, { file, out, crl, ocsp }
+    CommandsMap.AddLtvInformation, { file, out, crl, ocsp },
   );
 };
 
