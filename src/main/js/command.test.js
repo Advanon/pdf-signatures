@@ -48,8 +48,20 @@ describe('#buildArguments', () => {
 });
 
 describe('#parseResponse', () => {
-  test('parses successfull response', () => {
+  test('parses successful response', () => {
     const response = "STATUS=SUCCESS\nRESULT=HELLO\n";
+    const parsedResponse = {
+      status: 'SUCCESS',
+      result: 'HELLO',
+      errorMessage: null,
+      errorType: null,
+    };
+
+    expect(parseResponse(response)).toEqual(parsedResponse);
+  });
+
+  test('parses successful response with Windows line breaks', () => {
+    const response = "STATUS=SUCCESS\r\nRESULT=HELLO\r\n";
     const parsedResponse = {
       status: 'SUCCESS',
       result: 'HELLO',
@@ -72,7 +84,7 @@ describe('#parseResponse', () => {
     expect(parseResponse(response)).toEqual(parsedResponse);
   });
 
-  test('throws exception if paese fails', () => {
+  test('throws exception if parse fails', () => {
     const response = "random string";
 
     expect(() => {

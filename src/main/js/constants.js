@@ -1,5 +1,5 @@
 const PackageName = 'pdf-signatures';
-const PackageVersion = '0.0.2';
+const PackageVersion = '0.1.0';
 const ExecutablePath = `libs/${PackageName}-${PackageVersion}.jar`;
 
 /**

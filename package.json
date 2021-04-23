@@ -1,6 +1,6 @@
 {
   "name": "pdf-signatures",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Sign PDFs with electronic signatures in Nodejs",
   "main": "./src/main/js/index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "get-installed-path": "^4.0.8"
   },
   "devDependencies": {
-    "eslint": "^6.2.1",
+    "eslint": "^6.8.0",
     "eslint-plugin-node": "^9.1.0",
     "jest": "^24.9.0"
   },
