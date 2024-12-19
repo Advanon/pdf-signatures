@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Sign PDFs with electronic signatures in Nodejs",
   "main": "./src/main/js/index.js",
+  "types": "./src/main/js/index.d.ts",
   "scripts": {
     "test": "jest",
     "lint": "eslint .",
